@@ -7,21 +7,22 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 @WebServlet("/download")
-public class Download extends HttpServlet {
+public class DownloadServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setHeader("Content-Disposition", "attachment; filename=\"filename.txt\"");
-        resp.setContentType("text/plain");
+        resp.setContentType("application/json");
         resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        Files.readAllBytes(Path.of("resources", "first.json"));
-        try (PrintWriter writer = resp.getWriter()) {
-            writer.write("Data from servlet");
+
+//        Files.readAllBytes(Path.of("resources", "first.json"));
+        try (OutputStream outputStream = resp.getOutputStream();
+             InputStream inputStream = DownloadServlet.class.getClassLoader().getResourceAsStream("first.json")) {
+            outputStream.write(inputStream.readAllBytes());
         }
 
     }
